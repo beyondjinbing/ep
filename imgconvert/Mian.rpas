@@ -1,0 +1,132 @@
+
+var imgPath: Variant;
+    MagicPath : string;
+
+var
+Form1:TForm;//1
+Label1:TLabel;//2
+Button1:TButton;//3
+Edit1:TEdit;//4
+
+procedure CreateForm1;
+begin
+  //以下为窗口组件构造形成部分
+  Form1:=TForm.Create(nil);
+  Form1.Name:='Form1';
+  Form1.Caption:='';
+  Label1:=TLabel.Create(Form1);
+  Label1.Name:='Label1';
+  Label1.Parent:=Form1;
+  Label1.Caption:='';
+  Button1:=TButton.Create(Form1);
+  Button1.Name:='Button1';
+  Button1.Parent:=Form1;
+  Button1.Caption:='';
+  Edit1:=TEdit.Create(Form1);
+  Edit1.Name:='Edit1';
+  Edit1.Parent:=Form1;
+  Edit1.Text:='';
+  //以下为窗口组件属性初始化部分
+  Form1.Left:=263;
+  Form1.Top:=176;
+  Form1.Width:=928;
+  Form1.Height:=480;
+  Form1.Caption:='Form1';
+  Form1.Color:=clBtnFace;
+  Form1.Font.Charset:=DEFAULT_CHARSET;
+  Form1.Font.Color:=clWindowText;
+  Form1.Font.Height:=-13;
+  Form1.Font.Name:='宋体';
+  Form1.Font.Style:=0;
+  Form1.OldCreateOrder:=False;
+  Form1.OnShow:='FormShow';
+  Form1.PixelsPerInch:=96;
+  Label1.Left:=32;
+  Label1.Top:=24;
+  Label1.Width:=98;
+  Label1.Height:=13;
+  Label1.Caption:='图片文件夹路径:';
+  Button1.Left:=456;
+  Button1.Top:=18;
+  Button1.Width:=75;
+  Button1.Height:=25;
+  Button1.Caption:='选择目录';
+  Button1.TabOrder:=0;
+  Button1.OnClick:='Button1Click';
+  Edit1.Left:=136;
+  Edit1.Top:=20;
+  Edit1.Width:=305;
+  Edit1.Height:=21;
+  Edit1.TabOrder:=1;
+end;
+
+
+procedure FormShow(Sender: TObject);
+begin
+  if this.Windows64Bit then
+  begin
+    MagicPath := this.ReadRegistryValue( 2,'SOFTWARE\Wow6432Node\ImageMagick\6.8.9\Q:16','BinPath' );
+  end else
+  begin
+    MagicPath := this.ReadRegistryValue( 2,'SOFTWARE\ImageMagick\6.8.9\Q:16','BinPath' );
+  end;
+  if this.DirectoryExistsOrNot( MagicPath ) then
+  begin
+    MagicPath := this.Replace( MagicPath,'/','\' );
+    if Copy( MagicPath,Length(MagicPath),1 ) = '\' then
+    begin
+      Delete( MagicPath,Length(MagicPath),1 );
+    end;  
+    MagicPath := MagicPath + '\convert.exe';
+  end;
+end;
+
+procedure Button1Click(Sender: TObject);
+var imgList: Variant;
+  I: Integer;
+  CmdLine,ASourcePath,ATargetPath : string;
+begin
+  imgPath := this.FilePathDialogExecute('选择路径', '');
+  Edit1.Text := imgPath;
+  imgList := this.FindFileList(imgPath, '*.bmp', True, True, False);
+  this.Alert(imgList);
+  if imgList.count > 0 then
+  begin
+    for I := 0 to imgList.count - 1 do
+    begin
+      ASourcePath := imgList.strings[I];
+      ATargetPath := this.GetFileAttribute(ASourcePath,4)+this.GetFileAttribute(ASourcePath,9)+'_abbr.jpg';
+      CmdLine := MagicPath+' -blur 80 '+ASourcePath+' '+ATargetPath;
+    {  CmdLine := '"' + MagicPath + '" ' +
+        '"' + '-resize' + '" ' +
+        '"' + '48X48' + '" ' +
+        ' "' + ASourcePath + '" ' +
+        ' "' + ATargetPath + '" ';   }
+    this.Alert(CmdLine);
+      this.Run(CmdLine, 0, True);
+    end;
+  end;
+end;
+
+begin
+CreateForm1;
+//Use the skin files, please uncomment follow line.
+//Form1.ApplySkin('Put your skin file path at here.');
+//Set window alpha, please uncomment follow line.
+//Form1.Alpha := $800000 or $FF;
+//What's New In 3.0: Support Office Addin Develope and Support DLL Addin Mode.
+//Buildin Global Variable: CommandLine,OfficeAddin.
+//Include New EPX.
+//RedLeaf Hint: Put your initialize code here.
+
+
+
+//RedLeaf Hint: Put your start code here.
+//              Don't remove these code, otherwice project can't run.
+
+
+Form1.ShowModal;
+FreeAndNil(Form1);
+end.
+
+ 

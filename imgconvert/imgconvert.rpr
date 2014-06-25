@@ -1,0 +1,6 @@
+[Sources]
+0=Mian.rpas
+[Config]
+StartUnitFile=Mian.rpas
+BuilderStyle=bsExe
+Icon=C:\ep\imgconvert\imgconvert.ico
