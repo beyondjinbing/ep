@@ -1,0 +1,6 @@
+[Config]
+StartUnitFile=Main.rpas
+BuilderStyle=bsExe
+Icon=C:\ep\pdfconvert\Project1.ico
+[Sources]
+0=Main.rpas

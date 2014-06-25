@@ -1,0 +1,162 @@
+
+var pdf: Variant;
+  bmp: TBitmap;
+
+var
+Form1:TForm;//1
+pdfEP:TExcelPanelX;//2
+Button1:TButton;//3
+Button2:TButton;//4
+
+procedure CreateForm1;
+begin
+  //以下为窗口组件构造形成部分
+  Form1:=TForm.Create(nil);
+  Form1.Name:='Form1';
+  Form1.Caption:='';
+  pdfEP:=TExcelPanelX.Create(Form1);
+  pdfEP.Name:='pdfEP';
+  pdfEP.Parent:=Form1;
+  Button1:=TButton.Create(Form1);
+  Button1.Name:='Button1';
+  Button1.Parent:=Form1;
+  Button1.Caption:='';
+  Button2:=TButton.Create(Form1);
+  Button2.Name:='Button2';
+  Button2.Parent:=Form1;
+  Button2.Caption:='';
+  //以下为窗口组件属性初始化部分
+  Form1.Left:=463;
+  Form1.Top:=107;
+  Form1.Width:=590;
+  Form1.Height:=493;
+  Form1.Caption:='Form1';
+  Form1.Color:=clBtnFace;
+  Form1.Font.Charset:=DEFAULT_CHARSET;
+  Form1.Font.Color:=clWindowText;
+  Form1.Font.Height:=-13;
+  Form1.Font.Name:='宋体';
+  Form1.Font.Style:=0;
+  Form1.OldCreateOrder:=False;
+  Form1.OnClose:='FormClose';
+  Form1.OnShow:='FormShow';
+  Form1.PixelsPerInch:=96;
+  pdfEP.Left:=-8;
+  pdfEP.Top:=0;
+  pdfEP.Width:=500;
+  pdfEP.Height:=465;
+  pdfEP.TabOrder:=0;
+  Button1.Left:=504;
+  Button1.Top:=40;
+  Button1.Width:=75;
+  Button1.Height:=25;
+  Button1.Caption:='批量转换';
+  Button1.TabOrder:=1;
+  Button1.OnClick:='Button1Click';
+  Button2.Left:=504;
+  Button2.Top:=8;
+  Button2.Width:=75;
+  Button2.Height:=25;
+  Button2.Caption:='单个转换';
+  Button2.TabOrder:=2;
+  Button2.OnClick:='Button2Click';
+end;
+
+
+procedure Button1Click(Sender: TObject);
+var pdfPath: string;
+  pdfFile, pdfName, bmpName: string;
+  curPage: Variant;
+  pdfFileList: Variant;
+  I: Integer;
+begin
+  pdfPath := this.FilePathDialogExecute('选择文件', '');
+  pdfFileList := this.FindFileList(pdfPath, '*.pdf', True, False, False);
+  if pdfFileList.count > 0 then
+  begin
+    for I := 0 to pdfFileList.count - 1 do
+    begin
+      pdfFile := pdfFileList.Strings[I];
+      if (this.FileExists(pdfFile)) then
+      begin
+        pdf.OpenFile(pdfFile, '');
+        curPage := pdf.curPage;
+        bmp.Handle := pdf.GetBitmap(curPage, 480, 480, 0, 0, pdf.GetPageWidth(curPage), pdf.GetPageHeight(curPage), 2);
+        if (bmp.Handle > 0) then
+        begin
+          try
+            pdfName := this.GetFileAttribute(pdfFile, 9);
+            bmpName := this.GetFileAttribute(pdfFile,4)  + pdfName + '_abbr.bmp';
+            bmp.SaveToFile(bmpName);
+          except
+            this.Alert('异常');
+          end;
+        end;
+      end;
+    end;
+  end;
+
+
+end;
+
+procedure FormShow(Sender: TObject);
+begin
+  bmp := TBitmap.create;
+  bmp.Width := 48;
+  bmp.Height := 48;
+  bmp.PixelFormat := 2;
+  pdfEP.ActivePDFFileViewer := True;
+  pdf := pdfEP.PDFViewer;
+end;
+
+procedure Button2Click(Sender: TObject);
+var pdfFile,curPage,pdfName,bmpName: string;
+begin
+  pdfFile := this.OpenDialogExecute('*.pdf|*.pdf', '', False);
+  if (this.FileExists(pdfFile)) then
+  begin
+    pdf.OpenFile(pdfFile, '');
+    curPage := pdf.curPage;
+    bmp.Handle := pdf.GetBitmap(curPage, 480, 480, 0, 0, pdf.GetPageWidth(curPage), pdf.GetPageHeight(curPage), 2);
+    if (bmp.Handle > 0) then
+    begin
+      try
+        pdfName := this.GetFileAttribute(pdfFile, 9);
+        bmpName := this.GetFileAttribute(pdfFile,4)  + pdfName + '_abbr.bmp';
+        bmp.SaveToFile(bmpName);
+        this.Alert('转换成功！');
+      except
+        this.Alert('转换异常！');
+      end;
+    end;
+  end;
+end;
+
+procedure FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  bmp.Free;
+  pdfEP.FreeMe;
+end;
+
+begin
+CreateForm1;
+//Use the skin files, please uncomment follow line.
+//Form1.ApplySkin('Put your skin file path at here.');
+//Set window alpha, please uncomment follow line.
+//Form1.Alpha := $800000 or $FF;
+//What's New In 3.0: Support Office Addin Develope and Support DLL Addin Mode.
+//Buildin Global Variable: CommandLine,OfficeAddin.
+//Include New EPX.
+//RedLeaf Hint: Put your initialize code here.
+
+
+
+//RedLeaf Hint: Put your start code here.
+//              Don't remove these code, otherwice project can't run.
+
+
+Form1.ShowModal;
+FreeAndNil(Form1);
+end.
+
+ 
